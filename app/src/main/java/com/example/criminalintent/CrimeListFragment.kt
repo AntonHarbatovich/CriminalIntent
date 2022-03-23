@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -63,8 +64,25 @@ class CrimeListFragment : Fragment() {
 
         fun bind(crime: Crime) {
             this.crime = crime
+            if (crime.requiresPolice) {
+                bindRequiresPolice()
+            } else {
+                bindSimple()
+            }
+        }
+
+        private fun bindSimple() {
             titleTextView.text = this.crime.title
             dateTextView.text = this.crime.date.toString()
+        }
+
+        private fun bindRequiresPolice() {
+            val buttonRequiresPolice: Button = itemView.findViewById(R.id.crime_button_requires_police)
+            titleTextView.text = this.crime.title
+            dateTextView.text = this.crime.date.toString()
+            buttonRequiresPolice.setOnClickListener {
+                Toast.makeText(context, "There is a call to the police", Toast.LENGTH_SHORT).show()
+            }
         }
 
         override fun onClick(p0: View?) {
@@ -76,7 +94,12 @@ class CrimeListFragment : Fragment() {
     private inner class CrimeAdapter(var crimes: List<Crime>) :
         RecyclerView.Adapter<CrimeHolder>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CrimeHolder {
-            val view = layoutInflater.inflate(R.layout.list_item_crime, parent, false)
+            val layout = when (viewType) {
+                CRIME_SIMPLE -> R.layout.list_item_crime
+                CRIME_REQUIRES_POLICE -> R.layout.list_item_crime_requires_police
+                else -> throw IllegalArgumentException("Invalid type")
+            }
+            val view = layoutInflater.inflate(layout, parent, false)
             return CrimeHolder(view)
         }
 
@@ -86,11 +109,20 @@ class CrimeListFragment : Fragment() {
         }
 
         override fun getItemCount(): Int = crimes.size
-
+        override fun getItemViewType(position: Int): Int {
+            val crime = crimes[position]
+            return when (crime.requiresPolice) {
+                true -> CRIME_REQUIRES_POLICE
+                else -> CRIME_SIMPLE
+            }
+        }
     }
 
     companion object {
         private const val TAG = "CrimeListFragment"
+
+        private const val CRIME_SIMPLE = 0
+        private const val CRIME_REQUIRES_POLICE = 1
 
         fun newInstance(): CrimeListFragment {
             return CrimeListFragment()
