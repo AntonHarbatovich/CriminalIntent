@@ -13,6 +13,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ofPattern
+import java.util.*
 
 
 class CrimeListFragment : Fragment() {
@@ -67,7 +72,7 @@ class CrimeListFragment : Fragment() {
         fun bind(crime: Crime) {
             this.crime = crime
             titleTextView.text = this.crime.title
-            dateTextView.text = this.crime.date.toString()
+            dateTextView.text = dateFormat(this.crime.date)
             solverImageView.visibility = if (crime.isSolved) {
                 View.VISIBLE
             } else {
@@ -79,6 +84,10 @@ class CrimeListFragment : Fragment() {
             Toast.makeText(context, "${crime.title} pressed!", Toast.LENGTH_SHORT).show()
         }
 
+        private fun dateFormat(date: Date): String {
+            val formatter = SimpleDateFormat("EEEE, LLL dd, yyyy")
+            return formatter.format(date)
+        }
     }
 
     private inner class CrimeAdapter(var crimes: List<Crime>) :
