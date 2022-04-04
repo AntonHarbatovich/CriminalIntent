@@ -1,9 +1,11 @@
 package com.example.criminalintent
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.room.Room
 import com.example.criminalintent.database.CrimeDatabase
+import com.example.criminalintent.database.migration_1_2
 import java.lang.IllegalStateException
 import java.util.*
 import java.util.concurrent.Executors
@@ -16,7 +18,8 @@ class CrimeRepository private constructor(context: Context) {
         context.applicationContext,
         CrimeDatabase::class.java,
         DATABASE_NAME
-    ).build()
+    ).addMigrations(migration_1_2)
+        .build()
 
     private val crimeDao = database.crimeDao()
     private val executor = Executors.newSingleThreadExecutor()
@@ -27,6 +30,7 @@ class CrimeRepository private constructor(context: Context) {
 
     fun updateCrime(crime: Crime) {
         executor.execute {
+            Log.d("CrimeRepository","fun updateCrime")
             crimeDao.updateCrime(crime)
         }
     }

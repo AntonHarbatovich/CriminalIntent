@@ -13,10 +13,6 @@ private const val RESULT_DATE_KEY = "resultDateKey"
 
 class DatePickerFragment : DialogFragment() {
 
-    interface Callbacks {
-        fun onDateSelected(date: Date)
-    }
-
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
 
         val dateListener = DatePickerDialog.OnDateSetListener { datePicker, year, month, day ->
