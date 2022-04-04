@@ -68,11 +68,11 @@ class CrimeFragment : Fragment(), FragmentResultListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val crimeId = arguments?.getSerializable(ARG_CRIME_ID) as UUID
-        crimeDetailViewModel.initLiveData().observe(
+        crimeDetailViewModel.crimeLiveData.observe(
             viewLifecycleOwner,
             Observer { crime ->
                 crime?.let {
-                    this.crime = crime
+                    this.crime = crimeDetailViewModel.loadSuspect(crime)
                     updateUI()
                 }
             })
@@ -194,9 +194,7 @@ class CrimeFragment : Fragment(), FragmentResultListener {
                     // that is your suspect's name.
                     it.moveToFirst()
                     val suspect = it.getString(0)
-                    crime.suspect = suspect
-                    crimeDetailViewModel.saveCrime(crime)
-                    suspectButton.text = suspect
+                    crimeDetailViewModel.saveSuspect(suspect)
                 }
             }
         }

@@ -14,21 +14,13 @@ class CrimeDetailViewModel : ViewModel() {
     private val crimeRepository: CrimeRepository = CrimeRepository.get()
     private val crimeIdLivedata = MutableLiveData<UUID>()
     private var _crimeLiveData = MutableLiveData<Crime?>()
-    private val crime: Crime? = null
+    private var crime: Crime? = null
+    var suspect: String? = null
 
 
-    fun initLiveData(): LiveData<Crime?> {
-        var crimeLiveData: LiveData<Crime?> = _crimeLiveData
-        if (crime == null) {
-            crimeLiveData = Transformations.switchMap(crimeIdLivedata) { crimeId ->
-                crimeRepository.getCrime(crimeId)
-            }
-        } else {
-            _crimeLiveData.value = crime
-        }
-        return crimeLiveData
+    val crimeLiveData = Transformations.switchMap(crimeIdLivedata) { crimeId ->
+        crimeRepository.getCrime(crimeId)
     }
-
 
     fun loadCrime(crimeId: UUID) {
         crimeIdLivedata.value = crimeId
@@ -37,5 +29,19 @@ class CrimeDetailViewModel : ViewModel() {
     fun saveCrime(crime: Crime) {
         Log.d(TAG, "Crime: $crime")
         crimeRepository.updateCrime(crime)
+    }
+
+    fun saveSuspect(suspect: String?) {
+        this.suspect = suspect
+        Log.e(TAG, "save suspect: ${this.suspect}")
+    }
+
+    fun loadSuspect(crime: Crime): Crime {
+        return if (suspect == null) {
+            crime
+        } else {
+            crime.suspect = suspect!!
+            crime
+        }
     }
 }
